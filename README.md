@@ -28,7 +28,7 @@ In EC2 command line:
 ```
 $ sudo su
 $ yum update
-$ yum install git (first time)
+$ yum install git
 $ yum install python3-pip
 ```
 
