@@ -37,7 +37,7 @@ Get GitHub link to repo.
 $ git clone https://github.com/kevinwlip/Fin_Sentiment_App.git
 $ cd [repo]
 $ python3 -m pip install tensorflow-cpu , prevents EC2 from crashing
-$ python3 -m pip install --ignore-installed streamlit` , prevents issue with requests library
+$ python3 -m pip install --ignore-installed streamlit , prevents issue with requests library
 $ python3 -m pip install -r requirements.txt
 ```
 
