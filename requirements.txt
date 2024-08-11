@@ -2,5 +2,4 @@ streamlit
 pandas
 datetime
 bs4
-random
 transformers
