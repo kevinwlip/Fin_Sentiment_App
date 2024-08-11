@@ -45,11 +45,11 @@ If issue with requests library try the following
 
 Run App
 
-`$ python3 -m streamlit run [app.py]`
+`$ python3 -m streamlit run app.py`
 
 Keep app running, even if you close the EC2 instance window/terminal
 
-`$ nohup python3 -m streamlit run [app.py]`
+`$ nohup python3 -m streamlit run app.py`
 
 Look for process ID and kill the app, to prevent AWS charges
 ```
