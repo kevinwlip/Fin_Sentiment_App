@@ -45,13 +45,13 @@ icon, header = st.columns(spec=[1,40], vertical_alignment="center")
 with icon:
     st.image(image="imgs/gnews.jpg", width=50)
 with header:
-    st.header(f"Financial Headings from today: {news_date()}")
+    st.header(f"Financial Headlines for today: {news_date()}")
 
 st.dataframe(df.style.map(lambda x: f"background-color: {'red' if x=='Negative' else 'green' if x=='Positive' else 'gray'}", 
                           subset=['Kip Model Sentiments', 'DistilRoberta Model Sentiments', 'Finbert Model Sentiments']), 
                           use_container_width=True)
 
-st.header("Distribution Graphs")
+st.header("Distribution Graphs of the Headlines")
 with st.container(border=True):
     left_column, right_column = st.columns(2)
 

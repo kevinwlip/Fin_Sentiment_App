@@ -5,10 +5,20 @@ README
 This is a Financial Sentimental Prediction Application created through 
 Streamlit and hosted on Amazon EC2
 
-Machine Learning Models created by myself and are hosted on
+Machine Learning Models created by myself and are hosted on HuggingFace
+
 HuggingFace - https://huggingface.co/kevinwlip
 
 GitHub - https://github.com/kevinwlip
+
+
+Project User Interface
+----------------------
+The Project is split into three sections:
+
+1. Daily Headlines are parsed and sentiment analysis is run across three models - Kip, DistilRoberta, and Finbert
+2. Distribution Graphs - Sentiment Distribution on Pie Chart & Probability Distribution using Line Graph.
+3. Try Financial Sentiment Predictions - Select a model, input a business headline, and see whether you obtain Negative, Positive or Neutral
 
 
 Deployment - Streamlit with AWS EC2
