@@ -12,6 +12,17 @@ HuggingFace - https://huggingface.co/kevinwlip
 GitHub - https://github.com/kevinwlip
 
 
+Repository
+----------
+'Data Work' folder - contains Capstone Step 5: Data Wrangling Notebook with Financial Data (Input and Output)
+'img' folder - contains Images for the App and the App UI
+'ML Models' folder - contains Capstone Step 8: Scale Your Prototype Notebook with Fine-Tuned models uploaded to HuggingFace
+'app.py' - Streamlit App
+'news_functions.py' - contains functions to parse Google News for use in 'app.py'
+'requirements.txt' - libraries need to run 'app.py'
+'README.md' - details about the project
+
+
 Project User Interface
 ----------------------
 The Project is split into three sections:
