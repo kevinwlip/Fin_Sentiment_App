@@ -32,8 +32,10 @@ The Project is split into three sections:
 3. Try Financial Sentiment Predictions - Select a model, input a business headline, and see whether you obtain Negative, Positive or Neutral
 
 
-Deployment - Streamlit with AWS EC2
------------------------------------
+Deployment - Streamlit with AWS EC2, but currently deployed on Streamlit
+------------------------------------------------------------------------
+
+Streamlit - https://finsentimentapp.streamlit.app/
 
 Sources:
 1. (Main) Deploying an OpenAI Streamlit Python App on AWS EC2 - https://www.youtube.com/watch?v=oynd7Xv2i9Y
