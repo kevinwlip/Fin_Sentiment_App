@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 from random import sample
 from transformers import pipeline
 
+num_of_headlines = 20
+
 # Print Timestamp At time of crawl
 def news_date():
    news_date = str(datetime.date.today().strftime('%A, %B %d, %Y'))
@@ -24,22 +26,23 @@ def news_scraper():
       raise Exception("Was not able to navigate to the Google News - Business section.")
 
    a_tags = soup.find_all('a')
-   business_titles = [tag.get_text() for tag in a_tags if len(tag.get_text().split()) >= 5]
-   ten_titles = sample(business_titles,10)
-   print(ten_titles)
-   return ten_titles
+   headlines = [tag.get_text() for tag in a_tags if len(tag.get_text().split()) >= 5]
+   sample_headlines = sample(headlines, num_of_headlines)
+   print(sample_headlines)
+   return sample_headlines
 
 # Format the output
-def output_format(headlines = news_scraper()):
+def output_format(sample_headlines = news_scraper()):
 
-   current_headlines = headlines
+   business_headlines = sample_headlines
+   business_headlines = [f"{i}. {headline}" for i, headline in enumerate(business_headlines, start=1)]
 
    model1_results = []
    model2_results = []
    model3_results = []
    sentiment_models = [pipeline(model="kevinwlip/financial-sentiment-model-5000-samples"), pipeline("sentiment-analysis", model="mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis"), pipeline("sentiment-analysis", model="ProsusAI/finbert")]
    for i, model in enumerate(sentiment_models):
-      for j, headline in enumerate(current_headlines):
+      for j, headline in enumerate(business_headlines):
          if i == 0:
                model1_results.append(sentiment_models[i]([headline]))
          elif i == 1:
@@ -48,25 +51,29 @@ def output_format(headlines = news_scraper()):
                model3_results.append(sentiment_models[i]([headline]))
 
    model1_vals = [item.values() for result in model1_results for item in result]
-   model1_output = [f"{x.capitalize()}, Probability: {y}" for x,y in model1_vals if x ]
+   model1_output = [f"{x.capitalize()},{y:.1%}" for x,y in model1_vals if x ]
    model1_output = [s.replace("Label_0", "Negative").replace("Label_1", "Positive").replace("Label_2", "Neutral") for s in model1_output]
+   model1_sentiment = [output.split(',')[0] for output in model1_output]
+   model1_probability = [output.split(',')[1] for output in model1_output]
 
    model2_vals = [item.values() for result in model2_results for item in result]
-   model2_output = [f"{x.capitalize()}, Probability: {y}" for x,y in model2_vals]
+   model2_output = [f"{x.capitalize()},{y:.1%}" for x,y in model2_vals]
+   model2_sentiment = [output.split(',')[0] for output in model2_output]
+   model2_probability = [output.split(',')[1] for output in model2_output]
 
    model3_vals = [item.values() for result in model3_results for item in result]
-   model3_output = [f"{x.capitalize()}, Probability: {y}" for x,y in model3_vals]
+   model3_output = [f"{x.capitalize()},{y:.1%}" for x,y in model3_vals]
+   model3_sentiment = [output.split(',')[0] for output in model3_output]
+   model3_probability = [output.split(',')[1] for output in model3_output]
 
-   # Dataframes for DistilRoberta Financial News Sentiment Model
-   model1_df1 = pd.DataFrame([model1_output[:5]], columns = current_headlines[:5])
-   model1_df2 = pd.DataFrame([model1_output[5:]], columns = current_headlines[5:])
+   output = {"Kip Model Sentiments":model1_sentiment,
+           "Kip Model Probabilities":model1_probability,
+           "DistilRoberta Model Sentiments":model2_sentiment,
+           "DistilRoberta Model Probabilities":model2_probability,
+           "Finbert Model Sentiments":model3_sentiment,
+           "Finbert Model Probabilities":model3_probability}
 
-   # Dataframes for Prosus AI Finbert Financial Sentiment Model
-   model2_df1 = pd.DataFrame([model2_output[:5]], columns = current_headlines[:5])
-   model2_df2 = pd.DataFrame([model2_output[5:]], columns = current_headlines[5:])
+   df = pd.DataFrame(data=output, index=business_headlines)
+   df.index.name = 'Business Headlines'
 
-   # Dataframes for Kip's Self-Trained Model Financial Sentiment Model
-   model3_df1 = pd.DataFrame([model3_output[:5]], columns = current_headlines[:5])
-   model3_df2 = pd.DataFrame([model3_output[5:]], columns = current_headlines[5:])
-
-   return model1_df1, model1_df2, model2_df1, model2_df2, model3_df1, model3_df2
+   return df, model1_sentiment, model1_probability, model2_sentiment, model2_probability, model3_sentiment, model3_probability

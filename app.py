@@ -1,39 +1,76 @@
 import streamlit as st
+import pandas as pd
+import plotly.express as px
+from collections import Counter
 from transformers import pipeline
 from news_functions import *
 
+# Data Organization
+df, model1_sentiment, model1_probability, model2_sentiment, model2_probability, model3_sentiment, model3_probability = output_format()
 
-model1_df1, model1_df2, model2_df1, model2_df2, model3_df1, model3_df2 = output_format()
+m1_s_counts = Counter(model1_sentiment)
+m2_s_counts = Counter(model2_sentiment)
+m3_s_counts = Counter(model3_sentiment)
 
+pie_data = {'Model': ['Kip', 'DistilRoberta', 'Finbert'],
+            'Negative': [m1_s_counts['Negative'], m2_s_counts['Negative'], m3_s_counts['Negative']],
+            'Positive': [m1_s_counts['Positive'], m2_s_counts['Positive'], m3_s_counts['Positive']],
+            'Neutral': [m1_s_counts['Neutral'], m2_s_counts['Neutral'], m3_s_counts['Neutral']],
+            'Sum': [m1_s_counts['Negative']+m1_s_counts['Positive']+m1_s_counts['Neutral'], 
+                    m2_s_counts['Negative']+m2_s_counts['Positive']+m2_s_counts['Neutral'],
+                    m3_s_counts['Negative']+m3_s_counts['Positive']+m3_s_counts['Neutral']]}
+
+model1_probability = [prob.strip('%') for prob in model1_probability]
+model2_probability = [prob.strip('%') for prob in model2_probability]
+model3_probability = [prob.strip('%') for prob in model3_probability]
+
+line_data = {'Num_Of_Headlines': list(range(num_of_headlines+1))[1:],
+            'Kip': model1_probability,
+            'DistilRoberta': model2_probability,
+            'Finbert': model3_probability}
+
+pie_df = pd.DataFrame(pie_data)
+
+line_df = pd.DataFrame(line_data)
+
+# Streamlit App Components
 if "changed_model" not in st.session_state:
     st.session_state.changed_model = False
 if "button_selected" not in st.session_state:
     st.session_state.button_selected = False
 
-#NEED TO IMPLEMENT CACHING @st.cache_data
 st.set_page_config(page_title="Sentiment Analysis on News Headlines", layout="wide")
 
-col1, col2 = st.columns(spec=[1,40], vertical_alignment="center")
-with col1:
+icon, header = st.columns(spec=[1,40], vertical_alignment="center")
+with icon:
     st.image(image="imgs/gnews.jpg", width=50)
-with col2:
+with header:
     st.header(f"Financial Headings from today: {news_date()}")
 
-with st.container(border=True):
-    tab1, tab2, tab3 = st.tabs(["Kip's Self-Trained Financial Sentiment Model", "DistilRoberta Financial News Sentiment Model", "Prosus AI Finbert Financial Sentiment Model"])
-    with tab1:
-        st.header("Kip's")
-        st.dataframe(model1_df1, hide_index = True)
-        st.dataframe(model1_df2, hide_index = True)
-    with tab2:
-        st.header("DistilRoberta")
-        st.dataframe(model2_df1, hide_index = True)
-        st.dataframe(model2_df2, hide_index = True)
-    with tab3:
-        st.header("Prosus AI Finbert")
-        st.dataframe(model3_df1, hide_index = True)
-        st.dataframe(model3_df2, hide_index = True)
+st.dataframe(df.style.map(lambda x: f"background-color: {'red' if x=='Negative' else 'green' if x=='Positive' else 'gray'}", 
+                          subset=['Kip Model Sentiments', 'DistilRoberta Model Sentiments', 'Finbert Model Sentiments']), 
+                          use_container_width=True)
 
+st.header("Distribution Graphs")
+with st.container(border=True):
+    left_column, right_column = st.columns(2)
+
+    pie, line = st.columns(spec=[1,1])
+    with pie:
+        sentiment_types = st.selectbox('Sentiment Type', ['Negative', 'Positive', 'Neutral'], label_visibility='collapsed')
+        
+        fig = px.pie(pie_df, values=sentiment_types, names='Model',
+                    title=f'Number of {sentiment_types} types',
+                    height=300, width=200)
+        fig.update_layout(margin=dict(l=20, r=20, t=30, b=0), font=dict(size=16), hoverlabel=dict(font_size=16), legend=dict(font=dict(size=16)))
+        st.plotly_chart(fig, use_container_width=True)
+
+    with line:
+        fig = px.line(line_df, x=line_df['Num_Of_Headlines'], y=[line_df['Kip'], line_df['DistilRoberta'], line_df['Finbert']], title='Probability Distributions')
+        fig.update_layout(margin=dict(l=20, r=20, t=30, b=0), xaxis_title='Number of Headlines', yaxis_title='Probability (%)', legend_title_text='Models', legend_title=dict(font=dict(size=18)), legend=dict(font=dict(size=16)))
+        fig.update_xaxes(tickfont=dict(size=14))
+        fig.update_yaxes(tickfont=dict(size=14))
+        st.plotly_chart(fig, use_container_width=True)
 
 st.header("Try Financial Sentiment Predictions Yourself")
 with st.container(border=True):
@@ -47,20 +84,16 @@ with st.container(border=True):
             sentiment_model = pipeline("sentiment-analysis", model="mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis")
         elif model == "Prosus AI Finbert":
             sentiment_model = pipeline("sentiment-analysis", model="ProsusAI/finbert")
-        elif model == "Fine-Tuned DistilRoberta":
-            sentiment_model = pipeline("sentiment-analysis", model="kevinwlip/distilroberta-financial-sentiment-model-5000-samples-fine-tune")
-        elif model == "Fine-Tuned Prosus AI Finbert":
-            sentiment_model = pipeline("sentiment-analysis", model="kevinwlip/ProsusAI-finbert-5000-samples-fine-tune")
 
         vals = [result.values() for result in sentiment_model([input])]
-        output = [f"{x.capitalize()}, Probability: {y}" for x,y in vals][0]
+        output = [f"{x.capitalize()}, Probability: {y:.1%}" for x,y in vals][0]
         output = output.replace("Label_0", "Negative").replace("Label_1", "Positive").replace("Label_2", "Neutral")
 
         return output
 
     with left_column:
         st.header("Select Your Model:")
-        model = st.selectbox('Model', ["Kip's Self-Trained Model", "DistilRoberta", "Prosus AI Finbert", "Fine-Tuned DistilRoberta", "Fine-Tuned Prosus AI Finbert"])
+        model = st.selectbox('Model', ["Kip's Self-Trained Model", "DistilRoberta", "Prosus AI Finbert"])
         st.caption("Trained using 4K Training Data and 1K Test Data")
 
     with right_column:
@@ -71,5 +104,3 @@ with st.container(border=True):
             st.session_state.button_selected = True
             output = predict()
             st.success(output, icon="🎉")
-
-        st.caption("Label 0: Negative, Label 1: Positive, Label 2: Neutral")

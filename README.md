@@ -36,7 +36,8 @@ Get GitHub link to repo.
 ```
 $ git clone https://github.com/kevinwlip/Fin_Sentiment_App.git
 $ cd [repo]
-$ python3 -m pip install tensorflow-cpu , prevents EC2 from crashing
+$ python3 -m pip install tensorflow --no-cache-dir , help prevent crash issue
+- Crash Issue: https://stackoverflow.com/questions/67381812/tensorflow-installation-killed-on-aws-ec2-instance
 $ python3 -m pip install --ignore-installed streamlit , prevents issue with requests library
 $ python3 -m pip install -r requirements.txt
 ```
