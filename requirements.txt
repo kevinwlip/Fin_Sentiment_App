@@ -2,3 +2,4 @@ beautifulsoup4
 pandas
 plotly-express
 transformers
+tensorflow
