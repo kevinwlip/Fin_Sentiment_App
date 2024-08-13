@@ -5,41 +5,41 @@ from collections import Counter
 from transformers import pipeline
 from news_functions import *
 
-# Data Organization
-df, model1_sentiment, model1_probability, model2_sentiment, model2_probability, model3_sentiment, model3_probability = output_format()
-
-m1_s_counts = Counter(model1_sentiment)
-m2_s_counts = Counter(model2_sentiment)
-m3_s_counts = Counter(model3_sentiment)
-
-pie_data = {'Model': ['Kip', 'DistilRoberta', 'Finbert'],
-            'Negative': [m1_s_counts['Negative'], m2_s_counts['Negative'], m3_s_counts['Negative']],
-            'Positive': [m1_s_counts['Positive'], m2_s_counts['Positive'], m3_s_counts['Positive']],
-            'Neutral': [m1_s_counts['Neutral'], m2_s_counts['Neutral'], m3_s_counts['Neutral']],
-            'Sum': [m1_s_counts['Negative']+m1_s_counts['Positive']+m1_s_counts['Neutral'], 
-                    m2_s_counts['Negative']+m2_s_counts['Positive']+m2_s_counts['Neutral'],
-                    m3_s_counts['Negative']+m3_s_counts['Positive']+m3_s_counts['Neutral']]}
-
-model1_probability = [prob.strip('%') for prob in model1_probability]
-model2_probability = [prob.strip('%') for prob in model2_probability]
-model3_probability = [prob.strip('%') for prob in model3_probability]
-
-line_data = {'Num_Of_Headlines': list(range(num_of_headlines+1))[1:],
-            'Kip': model1_probability,
-            'DistilRoberta': model2_probability,
-            'Finbert': model3_probability}
-
-pie_df = pd.DataFrame(pie_data)
-
-line_df = pd.DataFrame(line_data)
-
-# Streamlit App Components
-if "changed_model" not in st.session_state:
-    st.session_state.changed_model = False
-if "button_selected" not in st.session_state:
-    st.session_state.button_selected = False
-
 st.set_page_config(page_title="Sentiment Analysis on News Headlines", layout="wide")
+
+# Data Organization
+@st.cache_data(show_spinner="Hi Users, Fetching Data.. Please Wait...")
+def return_dfs():
+    df, model1_sentiment, model1_probability, model2_sentiment, model2_probability, model3_sentiment, model3_probability = output_format()
+
+    m1_s_counts = Counter(model1_sentiment)
+    m2_s_counts = Counter(model2_sentiment)
+    m3_s_counts = Counter(model3_sentiment)
+
+    pie_data = {'Model': ['Kip', 'DistilRoberta', 'Finbert'],
+                'Negative': [m1_s_counts['Negative'], m2_s_counts['Negative'], m3_s_counts['Negative']],
+                'Positive': [m1_s_counts['Positive'], m2_s_counts['Positive'], m3_s_counts['Positive']],
+                'Neutral': [m1_s_counts['Neutral'], m2_s_counts['Neutral'], m3_s_counts['Neutral']],
+                'Sum': [m1_s_counts['Negative']+m1_s_counts['Positive']+m1_s_counts['Neutral'], 
+                        m2_s_counts['Negative']+m2_s_counts['Positive']+m2_s_counts['Neutral'],
+                        m3_s_counts['Negative']+m3_s_counts['Positive']+m3_s_counts['Neutral']]}
+
+    model1_probability = [prob.strip('%') for prob in model1_probability]
+    model2_probability = [prob.strip('%') for prob in model2_probability]
+    model3_probability = [prob.strip('%') for prob in model3_probability]
+
+    line_data = {'Num_Of_Headlines': list(range(num_of_headlines+1))[1:],
+                'Kip': model1_probability,
+                'DistilRoberta': model2_probability,
+                'Finbert': model3_probability}
+
+    pie_df = pd.DataFrame(pie_data)
+
+    line_df = pd.DataFrame(line_data)
+
+    return df, pie_df, line_df
+
+df, pie_df, line_df = return_dfs()
 
 icon, header = st.columns(spec=[1,40], vertical_alignment="center")
 with icon:
@@ -77,7 +77,6 @@ with st.container(border=True):
     left_column, right_column = st.columns(2)
 
     def predict():
-        st.session_state.changed_model = True
         if model == "Kip's Self-Trained Model":
             sentiment_model = pipeline(model="kevinwlip/financial-sentiment-model-5000-samples")
         elif model == "DistilRoberta":
@@ -101,6 +100,5 @@ with st.container(border=True):
         input = st.text_input(label = "Financial Text", value = "Sales have risen in the export markets")
 
         if st.button("Predict Sentiment"):
-            st.session_state.button_selected = True
             output = predict()
             st.success(output, icon="🎉")
