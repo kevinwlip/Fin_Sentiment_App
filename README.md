@@ -1,7 +1,7 @@
 README
 ======
 
-This is a Financial Sentimental Prediction Application hosted on Streamlit
+This is a Financial Sentimental Prediction Application using HugginFace Pipelines (free) hosted on Streamlit
 
 Streamlit - [Financial Sentiment Analysis App](https://finsentimentappapi.streamlit.app/)
 
