@@ -36,6 +36,8 @@ Examples of the Application are in the 'img' folder
 Deploy Locally - Docker Containers
 -----------------------------------
 
+### 1. First install [Docker](https://www.docker.com)
+
 ### 2. Two Ways to Deploy Locally
 
 ### a. Current Way: Using 'docker compose'
