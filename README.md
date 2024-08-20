@@ -15,7 +15,7 @@ HuggingFace - https://huggingface.co/kevinwlip
 Repository
 -----------
 - **'Data Work' folder** - contains Capstone Step 5: Data Wrangling Notebook with Financial Data (Input and Output)
-- **'img' folder** - contains images used in the Application and the images of the Appication User Interface
+- **'imgs' folder** - contains images used in the Application and the images of the Appication User Interface
 - **'ML Models' folder** - contains Capstone Step 8: Scale Your Prototype Notebook with Fine-Tuned models uploaded to HuggingFace
 - **'app.py'** - My Financial Sentiment Streamlit App
 - **'news_functions.py'** - contains functions to parse Google News for use in 'app.py'
