@@ -3,11 +3,11 @@ README
 
 This is a Financial Sentimental Prediction Application using HugginFace Pipelines (free) hosted on Streamlit
 
-Streamlit - [Financial Sentiment Analysis App](https://finsentimentapp.streamlit.app/)
+Streamlit - [Financial Sentiment Analysis App](https://finsentimentapp.streamlit.app)
 
-Machine Learning Models created by myself and are hosted on HuggingFace - https://huggingface.co/kevinwlip
+Machine Learning Models created by myself and are hosted on [HuggingFace](https://huggingface.co/kevinwlip)
 
-GitHub - https://github.com/kevinwlip
+[GitHub](https://github.com/kevinwlip)
 
 
 Repository
@@ -36,9 +36,9 @@ Examples of the Application are in the 'img' folder
 Deploy Locally - Docker Containers
 -----------------------------------
 
-### Two Ways to Deploy Locally
+### 2. Two Ways to Deploy Locally
 
-### Current Way: Using 'docker compose'
+### a. Current Way: Using 'docker compose'
 
 Originally created from the self-constructed Dockerfile using
 ```
@@ -54,7 +54,7 @@ $ docker compose up --build
 Your application will be available at http://localhost:8501
 
 
-### Other Way: Using self-constructed Dockerfile
+### b. Other Way: Using self-constructed Dockerfile
 
 Self-constructed Dockerfile contents:
 
